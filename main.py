@@ -87,17 +87,7 @@ st.markdown("""
 # ==========================================
 
 
-@st.cache_data
-def ee_authenticate():
-    my_project = 'emerald-skill-479306-i0'
-    try:
-        ee.Initialize(project=my_project)
-    except Exception:
-        ee.Authenticate()
-        ee.Initialize(project=my_project)
 
-
-ee_authenticate()
 
 # ==========================================
 # 3. SIDEBAR CONTROLS & STATE DICTIONARIES
