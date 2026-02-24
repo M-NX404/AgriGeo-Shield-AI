@@ -6,7 +6,31 @@ from streamlit_folium import st_folium
 import pandas as pd
 import plotly.express as px
 import datetime
+import streamlit as st
+import ee
+import json
 
+@st.cache_data
+def ee_authenticate():
+    try:
+        # 1. Try to use the Secret Key from Streamlit Cloud
+        # This is what makes it work on the website!
+        service_account = st.secrets["gcp_service_account"]
+        
+        credentials = ee.ServiceAccountCredentials(
+            service_account["client_email"], 
+            key_data=json.dumps(dict(service_account))
+        )
+        ee.Initialize(credentials=credentials, project='emerald-skill-479306-i0')
+        
+    except:
+        # 2. If that fails, fallback to your laptop's login
+        # This keeps it working when you run it locally
+        try:
+            ee.Initialize(project='emerald-skill-479306-i0')
+        except:
+            ee.Authenticate()
+            ee.Initialize(project='emerald-skill-479306-i0')
 # ==========================================
 # 1. SYSTEM CONFIG & CUSTOM CSS (PREMIUM UI)
 # ==========================================
