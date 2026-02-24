@@ -6,10 +6,16 @@ from streamlit_folium import st_folium
 import pandas as pd
 import plotly.express as px
 import datetime
-import streamlit as st
-import ee
 import json
 
+# ==========================================
+# 1. SYSTEM CONFIG (MUST BE FIRST)
+# ==========================================
+st.set_page_config(layout="wide", page_title="AgriGeo-Shield: Viksit Bharat", initial_sidebar_state="expanded")
+
+# ==========================================
+# 2. GEE AUTHENTICATION HANDLER
+# ==========================================
 @st.cache_data
 def ee_authenticate():
     try:
@@ -31,12 +37,13 @@ def ee_authenticate():
         except:
             ee.Authenticate()
             ee.Initialize(project='emerald-skill-479306-i0')
-# ==========================================
-# 1. SYSTEM CONFIG & CUSTOM CSS (PREMIUM UI)
-# ==========================================
-st.set_page_config(layout="wide", page_title="AgriGeo-Shield: Viksit Bharat",
-                   initial_sidebar_state="expanded")
 
+# *** CRITICAL FIX: RUN AUTHENTICATION HERE BEFORE LOADING DATA ***
+ee_authenticate()
+
+# ==========================================
+# 3. CUSTOM CSS (PREMIUM UI)
+# ==========================================
 st.markdown("""
 <style>
     /* Metric Card Customization */
@@ -83,14 +90,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. GEE AUTHENTICATION HANDLER
-# ==========================================
-
-
-
-
-# ==========================================
-# 3. SIDEBAR CONTROLS & STATE DICTIONARIES
+# 4. SIDEBAR CONTROLS & STATE DICTIONARIES
 # ==========================================
 st.sidebar.title("🛠️ AgriGeo-Shield")
 st.sidebar.markdown("### 🌾 Women-Led Agri Intelligence")
@@ -156,6 +156,10 @@ analysis_type = st.sidebar.radio(
     ]
 )
 
+# ==========================================
+# 5. DATA LOADING (NOW SAFE TO RUN)
+# ==========================================
+
 if target_district_gaul == "Custom":
     custom_geom = ee.Geometry.Point([88.4344, 23.2423]).buffer(15000)
     study_area = ee.FeatureCollection(
@@ -170,7 +174,7 @@ start_date = f'{target_year}-01-01'
 end_date = f'{target_year}-12-31'
 
 # ==========================================
-# 4. SATELLITE TELEMETRY EXTRACTION
+# 6. SATELLITE TELEMETRY EXTRACTION
 # ==========================================
 lst_col = ee.ImageCollection("MODIS/061/MOD11A2").select('LST_Day_1km')
 rain_col = ee.ImageCollection("UCSB-CHG/CHIRPS/DAILY")
@@ -254,7 +258,7 @@ with st.spinner(f"🛰️ Processing Orbital Telemetry for {selected_display}...
         avg_ndwi = avg_ndwi * 0.80
 
 # ==========================================
-# 5. GEOSPATIAL BIOME & LOGIC ENGINES
+# 7. GEOSPATIAL BIOME & LOGIC ENGINES
 # ==========================================
 power_score = 50
 if avg_ndvi > 0.4:
@@ -386,7 +390,7 @@ elif "Mineral" in analysis_type:
 
 
 # ==========================================
-# 6. UI RENDERING PIPELINE (Top Section)
+# 8. UI RENDERING PIPELINE (Top Section)
 # ==========================================
 col_title, col_minimap = st.columns([3, 1])
 
@@ -428,7 +432,7 @@ kpi5.metric(" Annual Rainfall", f"{avg_rain:.2f} mm")
 st.markdown("---")
 
 # ==========================================
-# 7. TIME-SERIES COMPARISON ENGINE
+# 9. TIME-SERIES COMPARISON ENGINE
 # ==========================================
 st.markdown(
     f"### 📊 Temporal Yield & Risk Analysis ({compare_year} vs {target_year})")
@@ -499,7 +503,7 @@ with st.spinner(f"Generating Comparative Orbital Time-Series..."):
 st.markdown("---")
 
 # ==========================================
-# 8. SINGLE ULTRA-WIDE PROFESSIONAL MAP
+# 10. SINGLE ULTRA-WIDE PROFESSIONAL MAP
 # ==========================================
 # Dynamic Scientific Header
 map_headers = {
@@ -643,7 +647,7 @@ except Exception as e:
 st_folium(m_single, width=1200, height=500, returned_objects=[])
 
 # ==========================================
-# 9. UI RENDERING PIPELINE (Action Matrix)
+# 11. UI RENDERING PIPELINE (Action Matrix)
 # ==========================================
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown(f"<h2 style='text-align: center; color: #2ECC71;'>🎯 Dynamic Map-to-Policy Engine</h2>",
@@ -681,7 +685,7 @@ with col_skill:
 st.markdown("---")
 
 # ==========================================
-# 10. UI RENDERING PIPELINE (Yield & Economy)
+# 12. UI RENDERING PIPELINE (Yield & Economy)
 # ==========================================
 col_weps, col_ml = st.columns(2)
 
@@ -701,7 +705,7 @@ with col_ml:
 st.markdown("---")
 
 # ==========================================
-# 11. FINANCIALS, REPORTS & EXPORT
+# 13. FINANCIALS, REPORTS & EXPORT
 # ==========================================
 col_econ, col_export = st.columns(2)
 
@@ -746,7 +750,7 @@ Simulation Mode: {"2035 Climate Active" if future_mode else "Current Baseline"}
 Generated securely by AgriGeo-Shield Platform
 """
     st.download_button(label="📄 Generate Govt Policy Report (TXT)", data=report_text,
-                       file_name=f"Policy_{selected_display}.txt", mime="text/plain", use_container_width=True)
+                        file_name=f"Policy_{selected_display}.txt", mime="text/plain", use_container_width=True)
 
     safe_layer_name = analysis_type.split('.')[1].strip().replace(
         " ", "_").replace("(", "").replace(")", "")
@@ -762,7 +766,7 @@ Generated securely by AgriGeo-Shield Platform
             st.error(f"Failed to initiate export. Error: {e}")
 
 # ==========================================
-# 12. CREDIBILITY FOOTER
+# 14. CREDIBILITY FOOTER
 # ==========================================
 st.markdown("---")
 st.caption("**🛰️ Validated Orbital Data Sources:** • **Sentinel-2** (10m Multispectral NDVI, NDWI) • **Terra MODIS** (1km Land Surface Temp) • **UCSB CHIRPS** (5km Climate Precipitation) • **Landsat 8** (30m SWIR Mineralogy) • **ESA WorldCover** (10m LULC Fusion)")
