@@ -632,7 +632,7 @@ except:
     center = [77.9339, 10.2789]
 
 m_single = folium.Map(location=[center[1], center[0]],
-                      zoom_start=9, tiles="CartoDB positron", control_scale=False)
+                      zoom_start=9, tiles="OpenStreetMap", control_scale=False)
 try:
     map_id = ee.Image(active_image).getMapId(vis_params)
     folium.raster_layers.TileLayer(
