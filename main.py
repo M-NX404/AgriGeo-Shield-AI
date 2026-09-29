@@ -410,7 +410,7 @@ with col_title:
 
 with col_minimap:
     mini_map = folium.Map(location=[22.0, 79.0], zoom_start=4,
-                          tiles="CartoDB dark_matter", control_scale=False, zoom_control=False)
+                      tiles="OpenStreetMap", control_scale=False, zoom_control=False)
     try:
         mini_center = study_area.geometry().centroid().getInfo()['coordinates']
         folium.Marker(location=[mini_center[1], mini_center[0]], popup=selected_display, icon=folium.Icon(
